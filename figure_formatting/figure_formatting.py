@@ -48,6 +48,27 @@ tableauP = OrderedDict(
     ]
 )
 
+# TfL line colours, ordered for perceptual distinctiveness (tab10-style):
+# alternates warm/cool, keeps neighbours maximally distinct in hue & lightness.
+tfl = OrderedDict(
+    [
+        ("Victoria",           "#0098D4"),  # bright cyan-blue   — anchor
+        ("Central",            "#E32017"),  # strong red          — hard contrast
+        ("Piccadilly",         "#003688"),  # deep navy           — cool, distinct from red
+        ("Overground",         "#EE7C0E"),  # vivid orange        — warm, distinct from navy
+        ("District",           "#00782A"),  # deep green          — cool, distinct from orange
+        ("Metropolitan",       "#9B0056"),  # wine/magenta        — warm, distinct from green
+        ("Bakerloo",           "#B36305"),  # brown               — warm-neutral
+        ("Elizabeth",          "#6950A1"),  # medium purple       — cool, distinct from brown
+        ("Circle",             "#FFD300"),  # yellow              — bright warm, pops vs purple
+        ("Jubilee",            "#A0A5A9"),  # grey                — neutral break
+        ("DLR",                "#00A4A7"),  # teal                — cool, distinct from grey
+        ("Hammersmith & City", "#F3A9BB"),  # pink                — warm-light, distinct from teal
+        ("Waterloo & City",    "#95CDBA"),  # mint                — light cool
+        ("Northern",           "#000000"),  # black               — anchor at end
+    ]
+)
+
 colors = {
     "red": {
         0: "#ffebee",
@@ -357,15 +378,31 @@ fig_size = (3.15, 1.95)
 def square_ax(ax):
     ax.set_aspect(1.0 / ax.get_data_ratio())
 
-def set_formatting(Dict: formatting = formatting, context=None) -> None:
+def set_formatting(Dict: formatting = formatting, context=None, dark=False) -> None:
 
     if context == "talk":
         formatting.update({k: 16 for k in text_entries})
         formatting.update({k: 1.4 for k in line_entries})
     for k, v in formatting.items():
         rcParams[k] = v
-    color_cycler = cycler(color=cm.batlowS(np.linspace(0, 1, 10)))
-    rcParams['axes.prop_cycle'] = color_cycler
+    rcParams['axes.prop_cycle'] = cycler(color=list(tfl.values()))
+
+    if dark:
+        bg = "#000000"
+        fg = "#f0f0f0"
+        rcParams.update({
+            "figure.facecolor":   bg,
+            "axes.facecolor":     bg,
+            "savefig.facecolor":  bg,
+            "axes.edgecolor":     fg,
+            "axes.labelcolor":    fg,
+            "xtick.color":        fg,
+            "ytick.color":        fg,
+            "text.color":         fg,
+            "legend.facecolor":   bg,
+            "legend.edgecolor":   fg,
+            "grid.color":         "#3a3a3a",
+        })
 
 def respine():
     rcParams["axes.spines.right"] = True
@@ -375,5 +412,3 @@ def respine():
 def set_palette(palette: OrderedDict) -> None:
     color_cycle = palette.values()
     rcParams["axes.prop_cycle"] = cycler(color=color_cycle)
-
-
